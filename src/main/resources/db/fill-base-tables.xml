@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <!-- Should be only links to per-version cumulative changelog files. -->
+
+    <changeSet id="1" author="Tatyana">
+        <insert tableName="company">
+            <column name="title" value="Мебельная компания"/>
+            <column name="financial_account" value="15000"/>
+        </insert>
+
+        <insert tableName="provider">
+            <column name="title" value="Поставщик материалов для производства мебели"/>
+            <column name="financial_account" value="150000"/>
+        </insert>
+
+        <insert tableName="material">
+            <column name="title" value="Стекло"/>
+            <column name="price" value="1000"/>
+            <column name="units" value="м2"/>
+        </insert>
+
+        <insert tableName="material">
+            <column name="title" value="Металл"/>
+            <column name="price" value="2000"/>
+            <column name="units" value="м3"/>
+        </insert>
+
+        <insert tableName="material">
+            <column name="title" value="Массив"/>
+            <column name="price" value="10000"/>
+            <column name="units" value="м3"/>
+        </insert>
+
+        <insert tableName="material">
+            <column name="title" value="МДФ"/>
+            <column name="price" value="3000"/>
+            <column name="units" value="м2"/>
+        </insert>
+
+        <insert tableName="material">
+            <column name="title" value="ДСП"/>
+            <column name="price" value="1000"/>
+            <column name="units" value="м2"/>
+        </insert>
+
+        <insert tableName="material">
+            <column name="title" value="Пластик"/>
+            <column name="price" value="1000"/>
+            <column name="units" value="м3"/>
+        </insert>
+
+        <insert tableName="material">
+            <column name="title" value="Ткань"/>
+            <column name="price" value="500"/>
+            <column name="units" value="м2"/>
+        </insert>
+
+        <insert tableName="material">
+            <column name="title" value="Поролон"/>
+            <column name="price" value="500"/>
+            <column name="units" value="м2"/>
+        </insert>
+
+        <insert tableName="product">
+            <column name="title" value="Стол"/>
+        </insert>
+
+        <insert tableName="product">
+            <column name="title" value="Кресло"/>
+        </insert>
+
+        <insert tableName="product">
+            <column name="title" value="Кровать"/>
+        </insert>
+
+        <insert tableName="product">
+            <column name="title" value="Стул"/>
+        </insert>
+
+        <insert tableName="product">
+            <column name="title" value="Диван"/>
+        </insert>
+
+        <insert tableName="product">
+            <column name="title" value="Шкаф"/>
+        </insert>
+
+        <insert tableName="client">
+            <column name="username" value="Иван"/>
+            <column name="created_at" value="now()"/>
+        </insert>
+
+        <sql>
+
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Стол'), (SELECT id from material WHERE title = 'Металл'), 2);
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Стол'), (SELECT id from material WHERE title = 'Стекло'), 1);
+
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Кресло'), (SELECT id from material WHERE title = 'ДСП'), 2);
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Кресло'), (SELECT id from material WHERE title = 'Поролон'),
+                    2);
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Кресло'), (SELECT id from material WHERE title = 'Ткань'),
+                    2);
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Кресло'), (SELECT id from material WHERE title = 'Пластик'),
+                    1);
+
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Кровать'), (SELECT id from material WHERE title = 'Массив'),
+                    3);
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Кровать'), (SELECT id from material WHERE title = 'Ткань'),
+                    6);
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Кровать'), (SELECT id from material WHERE title = 'Поролон'),
+                    6);
+
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Стул'), (SELECT id from material WHERE title = 'Пластик'),
+                    2);
+
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Диван'), (SELECT id from material WHERE title = 'МДФ'), 4);
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Диван'), (SELECT id from material WHERE title = 'Ткань'), 4);
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Диван'), (SELECT id from material WHERE title = 'Поролон'),
+                    4);
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Диван'), (SELECT id from material WHERE title = 'Пластик'),
+                    1);
+
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Шкаф'), (SELECT id from material WHERE title = 'МДФ'), 8);
+            INSERT INTO product_material (product_id, material_id, material_quantity)
+            VALUES ((SELECT id from product WHERE title = 'Шкаф'), (SELECT id from material WHERE title = 'Пластик'),
+                    1);
+
+            INSERT INTO company_material_store (company_id, material_id, quantity)
+            VALUES ((SELECT id from company WHERE title = 'Мебельная компания'),
+                    (SELECT id from material WHERE title = 'Стекло'), 50);
+            INSERT INTO company_material_store (company_id, material_id, quantity)
+            VALUES ((SELECT id from company WHERE title = 'Мебельная компания'),
+                    (SELECT id from material WHERE title = 'Металл'), 50);
+            INSERT INTO company_material_store (company_id, material_id, quantity)
+            VALUES ((SELECT id from company WHERE title = 'Мебельная компания'),
+                    (SELECT id from material WHERE title = 'Массив'), 50);
+            INSERT INTO company_material_store (company_id, material_id, quantity)
+            VALUES ((SELECT id from company WHERE title = 'Мебельная компания'),
+                    (SELECT id from material WHERE title = 'МДФ'), 50);
+            INSERT INTO company_material_store (company_id, material_id, quantity)
+            VALUES ((SELECT id from company WHERE title = 'Мебельная компания'),
+                    (SELECT id from material WHERE title = 'ДСП'), 50);
+            INSERT INTO company_material_store (company_id, material_id, quantity)
+            VALUES ((SELECT id from company WHERE title = 'Мебельная компания'),
+                    (SELECT id from material WHERE title = 'Пластик'), 50);
+            INSERT INTO company_material_store (company_id, material_id, quantity)
+            VALUES ((SELECT id from company WHERE title = 'Мебельная компания'),
+                    (SELECT id from material WHERE title = 'Ткань'), 50);
+            INSERT INTO company_material_store (company_id, material_id, quantity)
+            VALUES ((SELECT id from company WHERE title = 'Мебельная компания'),
+                    (SELECT id from material WHERE title = 'Поролон'), 50);
+
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

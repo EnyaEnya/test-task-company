@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+
+    <changeSet author="Tatyana" id="0">
+        <sql>create extension btree_gin</sql>
+    </changeSet>
+
+    <changeSet author="Tatyana" id="1">
+        <createTable tableName="client">
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_client"/>
+            </column>
+            <column name="username" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="Tatyana" id="2">
+        <createTable tableName="material">
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_material"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="numeric(19, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="units" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <sql>
+            create index idx_material_title_gin on material using GIN (title);
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="Tatyana" id="3">
+        <createTable tableName="product">
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_product"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <sql>
+            create index idx_product_title_gin on product using GIN (title);
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="Tatyana" id="4">
+        <createTable tableName="product_material">
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_product_material"/>
+            </column>
+            <column name="product_id" type="bigint"/>
+            <column name="material_id" type="bigint"/>
+            <column name="material_quantity" type="integer"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="product_material"
+                                 baseColumnNames="product_id"
+                                 constraintName="fk_product_material_product_id"
+                                 referencedTableName="product"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="product_material"
+                                 baseColumnNames="material_id"
+                                 constraintName="fk_product_material_material_id"
+                                 referencedTableName="material"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet author="Tatyana" id="5">
+        <createTable tableName="company">
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_company"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="financial_account" type="numeric(19, 2)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="Tatyana" id="6" >
+        <comment>create enum type for status</comment>
+        <sql splitStatements="false" stripComments="true">
+            CREATE TYPE status AS ENUM (
+                    'APPROVED',
+                    'REJECTED'
+                );
+        </sql>
+
+    </changeSet>
+
+    <changeSet author="Tatyana" id="7">
+
+        <createTable tableName="order">
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_order"/>
+            </column>
+            <column name="client_id" type="bigint"/>
+            <column name="product_id" type="bigint"/>
+            <column name="company_id" type="bigint"/>
+            <column name="quantity" type="integer"/>
+            <column name="status" type="status"/>
+            <column name="processed" type="boolean"/>
+            <column name="total_price" type="numeric(19, 2)"/>
+            <column name="created_at" type="timestamp"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="order"
+                                 baseColumnNames="client_id"
+                                 constraintName="fk_order_client_id"
+                                 referencedTableName="client"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="order"
+                                 baseColumnNames="product_id"
+                                 constraintName="fk_order_product_id"
+                                 referencedTableName="product"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="order"
+                                 baseColumnNames="company_id"
+                                 constraintName="fk_order_company_id"
+                                 referencedTableName="company"
+                                 referencedColumnNames="id"/>
+
+        <createIndex tableName="order" indexName="idx_order_product_id">
+            <column name="product_id"/>
+        </createIndex>
+
+        <createIndex tableName="order" indexName="idx_order_company_id">
+            <column name="company_id"/>
+        </createIndex>
+
+        <createIndex tableName="order" indexName="idx_order_client_id">
+            <column name="client_id"/>
+        </createIndex>
+
+        <createIndex tableName="order" indexName="idx_order_created_at">
+            <column name="created_at"/>
+        </createIndex>
+
+    </changeSet>
+
+    <changeSet author="Tatyana" id="8">
+        <createTable tableName="company_material_store">
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_company_material_store"/>
+            </column>
+            <column name="company_id" type="bigint"/>
+            <column name="material_id" type="bigint"/>
+            <column name="quantity" type="integer"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="company_material_store"
+                                 baseColumnNames="company_id"
+                                 constraintName="fk_company_material_store_company_id"
+                                 referencedTableName="company"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="company_material_store"
+                                 baseColumnNames="material_id"
+                                 constraintName="fk_company_material_store_material_id"
+                                 referencedTableName="material"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet author="Tatyana" id="9">
+        <createTable tableName="provider">
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_provider"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="financial_account" type="numeric(19, 2)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="Tatyana" id="10">
+        <createTable tableName="offer">
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_material_offer"/>
+            </column>
+            <column name="material_id" type="bigint"/>
+            <column name="company_id" type="bigint"/>
+            <column name="provider_id" type="bigint"/>
+            <column name="quantity" type="integer"/>
+            <column name="status" type="status"/>
+            <column name="total_price" type="numeric(19, 2)"/>
+            <column name="processed" type="boolean"/>
+            <column name="created_at" type="timestamp"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="offer"
+                                 baseColumnNames="material_id"
+                                 constraintName="fk_material_offer_material_id"
+                                 referencedTableName="material"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="offer"
+                                 baseColumnNames="company_id"
+                                 constraintName="fk_offer_company_id"
+                                 referencedTableName="company"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="offer"
+                                 baseColumnNames="provider_id"
+                                 constraintName="fk_offer_provider_id"
+                                 referencedTableName="provider"
+                                 referencedColumnNames="id"/>
+
+        <createIndex tableName="offer" indexName="idx_offer_material_id">
+            <column name="material_id"/>
+        </createIndex>
+
+        <createIndex tableName="offer" indexName="idx_offer_company_id">
+            <column name="company_id"/>
+        </createIndex>
+
+        <createIndex tableName="offer" indexName="idx_offer_provider_id">
+            <column name="provider_id"/>
+        </createIndex>
+
+        <createIndex tableName="offer" indexName="idx_offer_created_at">
+            <column name="created_at"/>
+        </createIndex>
+
+    </changeSet>
+
+
+</databaseChangeLog>

@@ -1,0 +1,20 @@
+server:
+  port: 8181
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5431/test_task_db
+    username: user
+    password: password
+  liquibase:
+    change-log: db/changelog.xml
+#  jpa:
+#    show-sql: true
+
+#logging:
+#  level:
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.type.descriptor.sql: TRACE
+#    org.hibernate.orm.jdbc.bind: TRACE
+#    net.ttddyy.dsproxy: debug
+
+#net.ttddyy.dsproxy

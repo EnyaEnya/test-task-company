@@ -1,18 +1,15 @@
 package com.example.testtaskcompany.service;
 
 import com.example.testtaskcompany.dto.OfferDto;
-import com.example.testtaskcompany.dto.report.OfferReportFilter;
 import com.example.testtaskcompany.dto.report.PageDto;
+import com.example.testtaskcompany.dto.report.filter.OfferReportFilter;
 import com.example.testtaskcompany.entities.*;
-import com.example.testtaskcompany.entities.Company_;
-import com.example.testtaskcompany.entities.Material_;
-import com.example.testtaskcompany.entities.Offer_;
-import com.example.testtaskcompany.entities.Provider_;
 import com.example.testtaskcompany.repository.OfferRepository;
 import com.example.testtaskcompany.service.interfaces.IReportOfferService;
 import com.example.testtaskcompany.utils.Specifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -28,7 +25,7 @@ public class ReportOfferService implements IReportOfferService, Specifications<O
     @Transactional
     @Cacheable("offers")
     public PageDto<OfferDto> getOffers(OfferReportFilter request) {
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(request.getPageNumber(), request.getPageSize(), request.getSort());
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), request.getSort());
         Specification<Offer> specification = equal(Offer_.status, request.getStatus())
                 .and(equal(root -> root.get(Offer_.company).get(Company_.id), request.getCompanyId()))
                 .and(equal(root -> root.get(Offer_.provider).get(Provider_.id), request.getProviderId()))

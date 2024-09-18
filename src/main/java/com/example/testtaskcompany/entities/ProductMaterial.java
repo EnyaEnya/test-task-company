@@ -4,23 +4,19 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
 @Getter
 @Setter
+@Entity
 @Table(schema = "public", name = "product_material")
-public class ProductMaterial {
+public class ProductMaterial extends AbstractIdEntity {
 
-    @Id
-    private Long id;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_id")
     private Product product;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="material_id")
     private Material material;
 
-    private Integer materialQuantity;
-
+    private int materialQuantity;
 }

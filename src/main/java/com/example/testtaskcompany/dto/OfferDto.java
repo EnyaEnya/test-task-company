@@ -11,20 +11,20 @@ import java.time.Instant;
 @Setter
 public class OfferDto {
 
-    private Long id;
+    private long id;
     private String materialTitle;
     private Status status;
-    private Integer quantity;
-    private Long companyId;
-    private Long providerId;
+    private int quantity;
+    private long companyId;
+    private long providerId;
     private boolean processed;
     private BigDecimal totalPrice;
     private Instant createdAt;
 
 
-    public OfferDto(Long id, Instant createdAt, BigDecimal totalPrice,
-                    boolean processed, Long providerId, Long companyId,
-                    Integer quantity, Status status, String materialTitle) {
+    public OfferDto(long id, Instant createdAt, BigDecimal totalPrice,
+                    boolean processed, long providerId, long companyId,
+                    int quantity, Status status, String materialTitle) {
         this.id = id;
         this.createdAt = createdAt;
         this.totalPrice = totalPrice;

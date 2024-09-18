@@ -1,8 +1,8 @@
 package com.example.testtaskcompany.service;
 
 import com.example.testtaskcompany.dto.OrderDto;
-import com.example.testtaskcompany.dto.report.OrderReportFilter;
 import com.example.testtaskcompany.dto.report.PageDto;
+import com.example.testtaskcompany.dto.report.filter.OrderReportFilter;
 import com.example.testtaskcompany.entities.Company_;
 import com.example.testtaskcompany.entities.Order;
 import com.example.testtaskcompany.entities.Order_;
@@ -12,6 +12,7 @@ import com.example.testtaskcompany.service.interfaces.IReportOrderService;
 import com.example.testtaskcompany.utils.Specifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class ReportOrderService implements IReportOrderService, Specifications<O
     @Transactional
     @Cacheable("orders")
     public PageDto<OrderDto> getOrders(OrderReportFilter request) {
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(request.getPageNumber(), request.getPageSize(), request.getSort());
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), request.getSort());
         Specification<Order> specification = equal(Order_.status, request.getStatus())
                 .and(like(root -> root.get(Order_.product).get(Product_.title), request.getProductTitle()))
                 .and(equal(root -> root.get(Order_.company).get(Company_.id), request.getCompanyId()))

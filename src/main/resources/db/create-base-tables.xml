@@ -108,9 +108,9 @@
 
     <changeSet author="Tatyana" id="7">
 
-        <createTable tableName="order">
+        <createTable tableName="order_table">
             <column name="id" type="bigserial">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_order"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_order_table"/>
             </column>
             <column name="client_id" type="bigint"/>
             <column name="product_id" type="bigint"/>
@@ -122,37 +122,37 @@
             <column name="created_at" type="timestamp"/>
         </createTable>
 
-        <addForeignKeyConstraint baseTableName="order"
+        <addForeignKeyConstraint baseTableName="order_table"
                                  baseColumnNames="client_id"
-                                 constraintName="fk_order_client_id"
+                                 constraintName="fk_order_table_client_id"
                                  referencedTableName="client"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint baseTableName="order"
+        <addForeignKeyConstraint baseTableName="order_table"
                                  baseColumnNames="product_id"
-                                 constraintName="fk_order_product_id"
+                                 constraintName="fk_order_table_product_id"
                                  referencedTableName="product"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint baseTableName="order"
+        <addForeignKeyConstraint baseTableName="order_table"
                                  baseColumnNames="company_id"
-                                 constraintName="fk_order_company_id"
+                                 constraintName="fk_order_table_company_id"
                                  referencedTableName="company"
                                  referencedColumnNames="id"/>
 
-        <createIndex tableName="order" indexName="idx_order_product_id">
+        <createIndex tableName="order_table" indexName="idx_order_table_product_id">
             <column name="product_id"/>
         </createIndex>
 
-        <createIndex tableName="order" indexName="idx_order_company_id">
+        <createIndex tableName="order_table" indexName="idx_order_table_company_id">
             <column name="company_id"/>
         </createIndex>
 
-        <createIndex tableName="order" indexName="idx_order_client_id">
+        <createIndex tableName="order_table" indexName="idx_order_table_client_id">
             <column name="client_id"/>
         </createIndex>
 
-        <createIndex tableName="order" indexName="idx_order_created_at">
+        <createIndex tableName="order_table" indexName="idx_order_table_created_at">
             <column name="created_at"/>
         </createIndex>
 
@@ -194,9 +194,9 @@
     </changeSet>
 
     <changeSet author="Tatyana" id="10">
-        <createTable tableName="offer">
+        <createTable tableName="offer_table">
             <column name="id" type="bigserial">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_material_offer"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_material_offer_table"/>
             </column>
             <column name="material_id" type="bigint"/>
             <column name="company_id" type="bigint"/>
@@ -208,37 +208,37 @@
             <column name="created_at" type="timestamp"/>
         </createTable>
 
-        <addForeignKeyConstraint baseTableName="offer"
+        <addForeignKeyConstraint baseTableName="offer_table"
                                  baseColumnNames="material_id"
-                                 constraintName="fk_material_offer_material_id"
+                                 constraintName="fk_material_offer_table_material_id"
                                  referencedTableName="material"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint baseTableName="offer"
+        <addForeignKeyConstraint baseTableName="offer_table"
                                  baseColumnNames="company_id"
-                                 constraintName="fk_offer_company_id"
+                                 constraintName="fk_offer_table_company_id"
                                  referencedTableName="company"
                                  referencedColumnNames="id"/>
 
-        <addForeignKeyConstraint baseTableName="offer"
+        <addForeignKeyConstraint baseTableName="offer_table"
                                  baseColumnNames="provider_id"
-                                 constraintName="fk_offer_provider_id"
+                                 constraintName="fk_offer_table_provider_id"
                                  referencedTableName="provider"
                                  referencedColumnNames="id"/>
 
-        <createIndex tableName="offer" indexName="idx_offer_material_id">
+        <createIndex tableName="offer_table" indexName="idx_offer_table_material_id">
             <column name="material_id"/>
         </createIndex>
 
-        <createIndex tableName="offer" indexName="idx_offer_company_id">
+        <createIndex tableName="offer_table" indexName="idx_offer_table_company_id">
             <column name="company_id"/>
         </createIndex>
 
-        <createIndex tableName="offer" indexName="idx_offer_provider_id">
+        <createIndex tableName="offer_table" indexName="idx_offer_table_provider_id">
             <column name="provider_id"/>
         </createIndex>
 
-        <createIndex tableName="offer" indexName="idx_offer_created_at">
+        <createIndex tableName="offer_table" indexName="idx_offer_table_created_at">
             <column name="created_at"/>
         </createIndex>
 

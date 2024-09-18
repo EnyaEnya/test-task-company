@@ -7,8 +7,9 @@ spring:
     password: password
   liquibase:
     change-log: db/changelog.xml
-#  jpa:
-#    show-sql: true
+  jpa:
+    show-sql: true
+    database-platform: com.example.testtaskcompany.utils.PostgreSQLDialectExtended
 
 #logging:
 #  level:

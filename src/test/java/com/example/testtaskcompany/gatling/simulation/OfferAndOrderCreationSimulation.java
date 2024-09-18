@@ -23,9 +23,6 @@ import static org.apache.commons.lang3.RandomUtils.nextInt;
 
 public class OfferAndOrderCreationSimulation extends Simulation {
 
-    /**
-     * Total requests per second is 272 with current settings
-     **/
 
     private static final int MAX_PAGE_NUMBER = 10;
 
@@ -70,8 +67,8 @@ public class OfferAndOrderCreationSimulation extends Simulation {
     }
 
     private static void getInfoFromDatabaseBeforeTest() {
-        Long companyId = 1L;
-        Long providerId = 1L;
+        long companyId = 1L;
+        long providerId = 1L;
 
         try (Connection conn = DriverManager.getConnection(
                 DATABASE_URL, USER, PASSWORD);

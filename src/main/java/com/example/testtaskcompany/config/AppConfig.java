@@ -8,5 +8,4 @@ import org.springframework.retry.annotation.EnableRetry;
 @EnableRetry
 @EnableCaching
 public class AppConfig {
-
 }

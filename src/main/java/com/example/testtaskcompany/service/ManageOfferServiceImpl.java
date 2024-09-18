@@ -35,7 +35,7 @@ public class ManageOfferServiceImpl implements IManageOfferService {
     @Override
     @Transactional
     @CacheEvict(allEntries = true, cacheNames = "offers")
-    public Offer createOffer(Long materialId, Integer quantity, Long companyId, Long providerId) {
+    public Offer createOffer(long materialId, int quantity, long companyId, long providerId) {
         Offer offer = new Offer();
         offer.setMaterial(materialRepository.getReferenceById(materialId));
         offer.setCompany(companyRepository.getReferenceById(companyId));
@@ -71,7 +71,7 @@ public class ManageOfferServiceImpl implements IManageOfferService {
                     CompanyMaterialStore materialOnStore = companyMaterialStoreRepository
                             .findMaterialsOnStoreByMaterialIdAndCompanyId(offer.getMaterial().getId(), offer.getCompany().getId());
 
-                    Integer currentQuantityOnStore = materialOnStore.getQuantity();
+                    int currentQuantityOnStore = materialOnStore.getQuantity();
                     materialOnStore.setQuantity(currentQuantityOnStore + offer.getQuantity());
 
                     BigDecimal currentCompanyFinancial = company.getFinancialAccount();

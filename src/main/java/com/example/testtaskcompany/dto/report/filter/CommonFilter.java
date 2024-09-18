@@ -1,6 +1,6 @@
-package com.example.testtaskcompany.dto.report;
+package com.example.testtaskcompany.dto.report.filter;
 
-import com.example.testtaskcompany.dto.OrderDto;
+import com.example.testtaskcompany.dto.report.PageRequest;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

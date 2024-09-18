@@ -7,12 +7,12 @@ import lombok.Setter;
 @Setter
 public class PostOrderDto {
 
-    private Long productId;
-    private Integer quantity;
+    private long productId;
+    private int quantity;
     private String productTitle;
-    private Long companyId;
+    private long companyId;
 
-    public PostOrderDto(Long productId, Integer quantity, String productTitle, Long companyId) {
+    public PostOrderDto(long productId, int quantity, String productTitle, long companyId) {
         this.productId = productId;
         this.quantity = quantity;
         this.productTitle = productTitle;

@@ -7,14 +7,14 @@ import lombok.Setter;
 @Setter
 public class PostOfferDto {
 
-    private Long materialId;
-    private Integer quantity;
+    private long materialId;
+    private int quantity;
     private String materialTitle;
-    private Long companyId;
-    private Long providerId;
+    private long companyId;
+    private long providerId;
     private String units;
 
-    public PostOfferDto(Long materialId, Integer quantity, String materialTitle, Long companyId, Long providerId, String units) {
+    public PostOfferDto(long materialId, int quantity, String materialTitle, long companyId, long providerId, String units) {
         this.materialId = materialId;
         this.quantity = quantity;
         this.materialTitle = materialTitle;

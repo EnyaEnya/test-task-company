@@ -8,15 +8,15 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CompanyMaterialStoreRepository extends JpaRepository<com.example.testtaskcompany.entities.CompanyMaterialStore, Long> {
+public interface CompanyMaterialStoreRepository extends JpaRepository<CompanyMaterialStore, Long> {
 
     @Query("select cm from CompanyMaterialStore cm where cm.company.id =:companyId and cm.material.id =:materialId and cm.quantity >= :quantity")
-    com.example.testtaskcompany.entities.CompanyMaterialStore findMaterialsOnStoreWithQuantityAndCompanyId(Long materialId, Integer quantity, Long companyId);
+    CompanyMaterialStore findMaterialsOnStoreWithQuantityAndCompanyId(long materialId, int quantity, long companyId);
 
     @Query("select cm from CompanyMaterialStore cm where cm.material.id =:materialId and cm.company.id =:companyId")
-    com.example.testtaskcompany.entities.CompanyMaterialStore findMaterialsOnStoreByMaterialIdAndCompanyId(Long materialId, Long companyId);
+    CompanyMaterialStore findMaterialsOnStoreByMaterialIdAndCompanyId(long materialId, long companyId);
 
     @Query("select cm from CompanyMaterialStore cm where cm.company.id =:companyId")
-    List<com.example.testtaskcompany.entities.CompanyMaterialStore> findMaterialsOnStoreByCompanyId(Long companyId);
+    List<CompanyMaterialStore> findMaterialsOnStoreByCompanyId(long companyId);
 
 }

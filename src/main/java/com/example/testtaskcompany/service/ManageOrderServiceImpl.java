@@ -39,7 +39,7 @@ public class ManageOrderServiceImpl implements IManageOrderService {
     @Override
     @Transactional
     @CacheEvict(allEntries = true, cacheNames = "orders")
-    public Order createOrder(Long productId, Integer quantity, Long companyId) {
+    public Order createOrder(long productId, int quantity, long companyId) {
         Order order = new Order();
         order.setClient(clientRepository.getReferenceById(1L)); //todo get from security context
         order.setCompany(companyRepository.getReferenceById(companyId));

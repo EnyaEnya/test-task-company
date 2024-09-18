@@ -1,8 +1,8 @@
 package com.example.testtaskcompany.tests;
 
 import com.example.testtaskcompany.dto.OrderDto;
-import com.example.testtaskcompany.dto.report.OrderReportFilter;
 import com.example.testtaskcompany.dto.report.PageDto;
+import com.example.testtaskcompany.dto.report.filter.OrderReportFilter;
 import com.example.testtaskcompany.entities.*;
 import com.example.testtaskcompany.repository.CompanyMaterialStoreRepository;
 import com.example.testtaskcompany.repository.CompanyRepository;
@@ -14,7 +14,6 @@ import groovy.util.logging.Slf4j;
 import org.hibernate.Hibernate;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

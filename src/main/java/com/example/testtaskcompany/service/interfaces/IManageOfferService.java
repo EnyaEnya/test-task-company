@@ -5,7 +5,7 @@ import com.example.testtaskcompany.entities.Offer;
 
 public interface IManageOfferService {
 
-    Offer createOffer(Long materialId, Integer quantity, Long companyId, Long providerId);
+    Offer createOffer(long materialId, int quantity, long companyId, long providerId);
 
     OfferDto processOffer(Offer offer);
 }

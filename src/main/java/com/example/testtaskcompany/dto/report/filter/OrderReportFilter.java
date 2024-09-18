@@ -1,6 +1,5 @@
-package com.example.testtaskcompany.dto.report;
+package com.example.testtaskcompany.dto.report.filter;
 
-import com.example.testtaskcompany.dto.report.CommonFilter;
 import com.example.testtaskcompany.entities.Status;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,7 +16,7 @@ public class OrderReportFilter extends CommonFilter {
 
     private String productTitle;
 
-    private Long companyId;
+    private long companyId;
 
     private Instant createdFrom;
 

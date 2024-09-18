@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
     @Query("select count(o) > 0 from Order o where o.id = :orderId and o.processed = false and o.status = 'APPROVED'")
-    boolean checkOrderApprovedAndUnprocessed(Long orderId);
+    boolean checkOrderApprovedAndUnprocessed(long orderId);
 }

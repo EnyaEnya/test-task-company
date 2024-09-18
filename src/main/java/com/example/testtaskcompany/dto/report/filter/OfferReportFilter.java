@@ -1,4 +1,4 @@
-package com.example.testtaskcompany.dto.report;
+package com.example.testtaskcompany.dto.report.filter;
 
 import com.example.testtaskcompany.entities.Status;
 import lombok.EqualsAndHashCode;
@@ -16,9 +16,9 @@ public class OfferReportFilter extends CommonFilter {
 
     private String materialTitle;
 
-    private Long companyId;
+    private long companyId;
 
-    private Long providerId;
+    private long providerId;
 
     private Instant createdFrom;
 

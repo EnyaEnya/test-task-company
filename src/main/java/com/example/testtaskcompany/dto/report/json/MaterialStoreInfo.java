@@ -12,4 +12,6 @@ public class MaterialStoreInfo {
     private String materialTitle;
 
     private long materialQuantity;
+
+    private String materialUnits;
 }

@@ -41,8 +41,8 @@ public class CompanyInfoProjectionEntity extends AbstractIdEntity {
                                                    group by p.title) as alias_)),
                          'materialStoreInfoList',
                          array_to_json(array(select json_build_object('materialTitle', alias_.title, 'materialQuantity',
-                                                                      alias_.quantity)
-                                             from (select m.title, cms.quantity
+                                                                      alias_.quantity, 'materialUnits', alias_.units)
+                                             from (select m.title, cms.quantity, m.units
                                                    from material m
                                                             join company_material_store cms on m.id = cms.material_id
                                                    where cms.company_id = id) as alias_))))

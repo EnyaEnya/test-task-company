@@ -1,5 +1,6 @@
 package com.example.testtaskcompany.service;
 
+import com.example.testtaskcompany.aop.Sync;
 import com.example.testtaskcompany.dto.OrderDto;
 import com.example.testtaskcompany.entities.*;
 import com.example.testtaskcompany.repository.*;
@@ -10,10 +11,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -21,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.example.testtaskcompany.service.ManageOfferServiceImpl.LOCK;
+import static org.springframework.transaction.annotation.Isolation.SERIALIZABLE;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +32,6 @@ public class ManageOrderServiceImpl implements IManageOrderService {
     private final CompanyMaterialStoreRepository companyMaterialStoreRepository;
     private final ProductMaterialRepository productMaterialRepository;
     private final ClientRepository clientRepository;
-    private final PlatformTransactionManager txManager;
 
     @Override
     @Transactional
@@ -52,51 +49,45 @@ public class ManageOrderServiceImpl implements IManageOrderService {
         return orderRepository.save(order);
     }
 
+    @Sync
     @Override
+    @Transactional(isolation = SERIALIZABLE)
     @Retryable(retryFor = {CannotAcquireLockException.class})
     @CacheEvict(allEntries = true, cacheNames = "orders")
     public OrderDto processOrder(Order outOrder) {
 
-        TransactionTemplate txTemplate = new TransactionTemplate(txManager);
-        txTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
+        Order order = orderRepository.getReferenceById(outOrder.getId());
 
-        synchronized (LOCK) {
-            return txTemplate.execute(state -> {
+        if (orderRepository.checkOrderApprovedAndUnprocessed(order.getId())
+                && isEnoughMaterialOnStore(order)) {
 
-                Order order = orderRepository.getReferenceById(outOrder.getId());
+            findRequiredMaterials(order).forEach(productMaterial -> {
+                Material material = productMaterial.getMaterial();
+                CompanyMaterialStore companyMaterialStore = companyMaterialStoreRepository
+                        .findMaterialsOnStoreByMaterialIdAndCompanyId(material.getId(), order.getCompany().getId());
 
-                if (orderRepository.checkOrderApprovedAndUnprocessed(order.getId())
-                        && isEnoughMaterialOnStore(order)) {
+                int currentQuantity = companyMaterialStore.getQuantity();
+                companyMaterialStore.setQuantity(currentQuantity - (productMaterial.getMaterialQuantity() * order.getQuantity()));
+                companyMaterialStoreRepository.save(companyMaterialStore);
 
-                    findRequiredMaterials(order).forEach(productMaterial -> {
-                        Material material = productMaterial.getMaterial();
-                        CompanyMaterialStore companyMaterialStore = companyMaterialStoreRepository
-                                .findMaterialsOnStoreByMaterialIdAndCompanyId(material.getId(), order.getCompany().getId());
-
-                        int currentQuantity = companyMaterialStore.getQuantity();
-                        companyMaterialStore.setQuantity(currentQuantity - (productMaterial.getMaterialQuantity() * order.getQuantity()));
-                        companyMaterialStoreRepository.save(companyMaterialStore);
-
-                        log.info("orderId: {} orderMaterial: {} Material old quantity on store: {} Material new quantity on store: {}",
-                                order.getId(), material.getTitle(), currentQuantity, companyMaterialStore.getQuantity());
-                    });
-
-                    Company company = order.getCompany();
-                    BigDecimal currentCompanyFinancial = company.getFinancialAccount();
-                    company.setFinancialAccount(currentCompanyFinancial.add(order.getTotalPrice()));
-
-                    companyRepository.save(company);
-
-                    log.info("orderId: {} orderPrice: {} Company old financial: {} Company new financial: {}",
-                            order.getId(), order.getTotalPrice(), currentCompanyFinancial, company.getFinancialAccount());
-                } else {
-                    order.setStatus(Status.REJECTED);
-                }
-                order.setProcessed(true);
-                orderRepository.save(order);
-                return toDto(order);
+                log.info("orderId: {} orderMaterial: {} Material old quantity on store: {} Material new quantity on store: {}",
+                        order.getId(), material.getTitle(), currentQuantity, companyMaterialStore.getQuantity());
             });
+
+            Company company = order.getCompany();
+            BigDecimal currentCompanyFinancial = company.getFinancialAccount();
+            company.setFinancialAccount(currentCompanyFinancial.add(order.getTotalPrice()));
+
+            companyRepository.save(company);
+
+            log.info("orderId: {} orderPrice: {} Company old financial: {} Company new financial: {}",
+                    order.getId(), order.getTotalPrice(), currentCompanyFinancial, company.getFinancialAccount());
+        } else {
+            order.setStatus(Status.REJECTED);
         }
+        order.setProcessed(true);
+        orderRepository.save(order);
+        return toDto(order);
     }
 
     private BigDecimal processOrderPrice(Order order) {

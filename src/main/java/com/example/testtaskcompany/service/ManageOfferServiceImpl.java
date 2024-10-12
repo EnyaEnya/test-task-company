@@ -1,5 +1,6 @@
 package com.example.testtaskcompany.service;
 
+import com.example.testtaskcompany.aop.Sync;
 import com.example.testtaskcompany.dto.OfferDto;
 import com.example.testtaskcompany.entities.*;
 import com.example.testtaskcompany.repository.*;
@@ -10,13 +11,12 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+
+import static org.springframework.transaction.annotation.Isolation.SERIALIZABLE;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +28,6 @@ public class ManageOfferServiceImpl implements IManageOfferService {
     private final CompanyMaterialStoreRepository companyMaterialStoreRepository;
     private final CompanyRepository companyRepository;
     private final ProviderRepository providerRepository;
-    private final PlatformTransactionManager txManager;
-    public static final Object LOCK = new Object();
 
 
     @Override
@@ -48,54 +46,46 @@ public class ManageOfferServiceImpl implements IManageOfferService {
         return offerRepository.save(offer);
     }
 
-
+    @Sync
     @Override
+    @Transactional(isolation = SERIALIZABLE)
     @Retryable(retryFor = {CannotAcquireLockException.class})
     @CacheEvict(allEntries = true, cacheNames = "offers")
     public OfferDto processOffer(Offer offer) {
 
-        TransactionTemplate txTemplate = new TransactionTemplate(txManager);
-        txTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
+        Company company = offer.getCompany();
 
-        synchronized (LOCK) { //todo кластер + 4 ноды
+        if (offerRepository.checkOfferApprovedAndUnprocessed(offer.getId())
+                && ((company.getFinancialAccount()
+                .subtract(offer.getTotalPrice())
+                .compareTo(BigDecimal.ZERO)) >= 0)) {
 
-            return txTemplate.execute(state -> {
+            CompanyMaterialStore materialOnStore = companyMaterialStoreRepository
+                    .findMaterialsOnStoreByMaterialIdAndCompanyId(offer.getMaterial().getId(), offer.getCompany().getId());
 
-                Company company = offer.getCompany();
+            int currentQuantityOnStore = materialOnStore.getQuantity();
+            materialOnStore.setQuantity(currentQuantityOnStore + offer.getQuantity());
 
-                if (offerRepository.checkOfferApprovedAndUnprocessed(offer.getId())
-                        && ((company.getFinancialAccount()
-                        .subtract(offer.getTotalPrice())
-                        .compareTo(BigDecimal.ZERO)) >= 0)) {
+            BigDecimal currentCompanyFinancial = company.getFinancialAccount();
+            company.setFinancialAccount(currentCompanyFinancial.subtract(offer.getTotalPrice()));
 
-                    CompanyMaterialStore materialOnStore = companyMaterialStoreRepository
-                            .findMaterialsOnStoreByMaterialIdAndCompanyId(offer.getMaterial().getId(), offer.getCompany().getId());
+            Provider provider = offer.getProvider();
+            BigDecimal currentProviderFinancial = provider.getFinancialAccount();
+            provider.setFinancialAccount(currentProviderFinancial.add(offer.getTotalPrice()));
 
-                    int currentQuantityOnStore = materialOnStore.getQuantity();
-                    materialOnStore.setQuantity(currentQuantityOnStore + offer.getQuantity());
+            companyMaterialStoreRepository.save(materialOnStore);
+            companyRepository.save(company);
+            providerRepository.save(provider);
 
-                    BigDecimal currentCompanyFinancial = company.getFinancialAccount();
-                    company.setFinancialAccount(currentCompanyFinancial.subtract(offer.getTotalPrice()));
+            log.info("offerId: {} offerPrice: {} Company old financial: {} Company new financial: {}",
+                    offer.getId(), offer.getTotalPrice(), currentCompanyFinancial, company.getFinancialAccount());
 
-                    Provider provider = offer.getProvider();
-                    BigDecimal currentProviderFinancial = provider.getFinancialAccount();
-                    provider.setFinancialAccount(currentProviderFinancial.add(offer.getTotalPrice()));
-
-                    companyMaterialStoreRepository.save(materialOnStore);
-                    companyRepository.save(company);
-                    providerRepository.save(provider);
-
-                    log.info("offerId: {} offerPrice: {} Company old financial: {} Company new financial: {}",
-                            offer.getId(), offer.getTotalPrice(), currentCompanyFinancial, company.getFinancialAccount());
-
-                } else {
-                    offer.setStatus(Status.REJECTED);
-                }
-                offer.setProcessed(true);
-                offerRepository.save(offer);
-                return toDto(offer);
-            });
+        } else {
+            offer.setStatus(Status.REJECTED);
         }
+        offer.setProcessed(true);
+        offerRepository.save(offer);
+        return toDto(offer);
     }
 
 

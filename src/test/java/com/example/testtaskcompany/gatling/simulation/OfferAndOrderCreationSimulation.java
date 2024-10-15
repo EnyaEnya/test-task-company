@@ -26,10 +26,10 @@ public class OfferAndOrderCreationSimulation extends Simulation {
 
     private static final int MAX_PAGE_NUMBER = 10;
 
-    private static final int RATE_FOR_POST_REQUEST = 7;
+    private static final int RATE_FOR_POST_REQUEST = 5;
     private static final int DURATION_SEC_FOR_POST_REQUEST = 30;
 
-    private static final int RATE_FOR_GET_REQUEST = 7;
+    private static final int RATE_FOR_GET_REQUEST = 5;
     private static final int DURATION_SEC_FOR_GET_REQUEST = 30;
 
     private static final HttpProtocolBuilder HTTP_PROTOCOL_BUILDER = HttpDsl.http.baseUrl("http://localhost:8181");

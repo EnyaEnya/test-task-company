@@ -89,10 +89,6 @@
             <column name="title" value="Шкаф"/>
         </insert>
 
-        <insert tableName="client">
-            <column name="username" value="Иван"/>
-            <column name="created_at" value="now()"/>
-        </insert>
 
         <sql>
 

@@ -16,9 +16,12 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_client"/>
             </column>
             <column name="username" type="varchar(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" unique="true"/>
             </column>
             <column name="created_at" type="timestamp"/>
+            <column name="keycloak_id" type="uuid">
+                <constraints unique="true"/>
+            </column>
         </createTable>
     </changeSet>
 
@@ -243,6 +246,5 @@
         </createIndex>
 
     </changeSet>
-
 
 </databaseChangeLog>

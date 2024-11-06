@@ -2,6 +2,7 @@ package com.example.testtaskcompany.gatling.steps;
 
 import com.example.testtaskcompany.gatling.dto.GetOrderReportDto;
 import com.example.testtaskcompany.gatling.dto.PostOrderDto;
+import com.example.testtaskcompany.gatling.simulation.OfferAndOrderCreationSimulation;
 import io.gatling.javaapi.core.ChainBuilder;
 import io.gatling.javaapi.core.CoreDsl;
 import io.gatling.javaapi.http.HttpDsl;
@@ -17,6 +18,7 @@ public class OrderSteps {
                                 postOrderDto.getQuantity() + " шт." + ")")
                         .post("/order/products/manage")
                         .header("Content-Type", "application/json")
+                        .header("Authorization", "Bearer " + OfferAndOrderCreationSimulation.USER_TOKEN)
                         .body(StringBody("{\"productId\": " + postOrderDto.getProductId()
                                 + ",\"quantity\": " + postOrderDto.getQuantity() +
                                 ",\"companyId\": " + postOrderDto.getCompanyId() + "}"))

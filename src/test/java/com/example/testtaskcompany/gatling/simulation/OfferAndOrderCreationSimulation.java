@@ -6,19 +6,31 @@ import com.example.testtaskcompany.gatling.dto.PostOfferDto;
 import com.example.testtaskcompany.gatling.dto.PostOrderDto;
 import com.example.testtaskcompany.gatling.scenario.OfferScenario;
 import com.example.testtaskcompany.gatling.scenario.OrderScenario;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.gatling.javaapi.core.CoreDsl;
 import io.gatling.javaapi.core.PopulationBuilder;
 import io.gatling.javaapi.core.Simulation;
-import io.gatling.javaapi.http.HttpDsl;
 import io.gatling.javaapi.http.HttpProtocolBuilder;
 import org.apache.commons.rng.sampling.CollectionSampler;
 import org.apache.commons.rng.simple.RandomSource;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static io.gatling.javaapi.http.HttpDsl.http;
 import static org.apache.commons.lang3.RandomUtils.nextInt;
 
 public class OfferAndOrderCreationSimulation extends Simulation {
@@ -32,10 +44,12 @@ public class OfferAndOrderCreationSimulation extends Simulation {
     private static final int RATE_FOR_GET_REQUEST = 5;
     private static final int DURATION_SEC_FOR_GET_REQUEST = 30;
 
-    private static final HttpProtocolBuilder HTTP_PROTOCOL_BUILDER = HttpDsl.http.baseUrl("http://localhost:8181");
+    private static final HttpProtocolBuilder HTTP_PROTOCOL_BUILDER = http.baseUrl("http://localhost:8181");
     private static final String DATABASE_URL = "jdbc:postgresql://localhost:5431/test_task_db";
     private static final String USER = "user";
     private static final String PASSWORD = "password";
+    private static final String GET_ACCESS_TOKEN_URL = "http://localhost:8082/realms/TestCompanyRealm/protocol/openid-connect/token";
+    public static String USER_TOKEN;
 
     private final static List<PostOfferDto> OFFERS = new ArrayList<>();
     private final static List<PostOrderDto> ORDERS = new ArrayList<>();
@@ -46,6 +60,7 @@ public class OfferAndOrderCreationSimulation extends Simulation {
         getInfoFromDatabaseBeforeTest();
         generateGetOffersBeforeTest();
         generateGetOrdersBeforeTest();
+        USER_TOKEN = getUserAccessTokenBeforeTest();
     }
 
     public OfferAndOrderCreationSimulation() {
@@ -156,6 +171,35 @@ public class OfferAndOrderCreationSimulation extends Simulation {
             REPORT_ORDERS.add(getOrderReportDto);
         }
     }
+
+    private static String getUserAccessTokenBeforeTest() {
+        ObjectMapper mapper = new ObjectMapper();
+        String result;
+        HttpPost post = new HttpPost(GET_ACCESS_TOKEN_URL);
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("client_id", "company"));
+        urlParameters.add(new BasicNameValuePair("username", "ivanov"));
+        urlParameters.add(new BasicNameValuePair("password", "password"));
+        urlParameters.add(new BasicNameValuePair("grant_type", "password"));
+
+        try {
+            post.setEntity(new UrlEncodedFormEntity(urlParameters));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpClient.execute(post)) {
+            JsonNode actualObj = mapper.readTree(EntityUtils.toString(response.getEntity()));
+            result = actualObj.get("access_token") != null ? actualObj.get("access_token").asText() : "";
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return result;
+    }
+
 
     private static void processSql(Connection connection, String sql, Consumer<ResultSet> consumer) {
         try (PreparedStatement materialPreparedStatement = connection.prepareStatement(sql)) {

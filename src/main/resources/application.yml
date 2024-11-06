@@ -10,7 +10,27 @@ spring:
   jpa:
     show-sql: true
     database-platform: com.example.testtaskcompany.utils.PostgreSQLDialectExtended
-
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8082/realms/TestCompanyRealm
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8082/realms/TestCompanyRealm
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: company
+            scope:
+              - openid
+              - microprofile-jwt
+app:
+  keycloak-properties:
+    realm-name: TestCompanyRealm
+    client-id: admin-cli
+    client-secret: 16xbChzL0lwPNV232akR4n3HfUHFBSz4
 #logging:
 #  level:
 #    org.hibernate.SQL: DEBUG

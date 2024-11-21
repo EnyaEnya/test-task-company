@@ -1,46 +1,54 @@
 package com.example.testtaskcompany.tests;
 
+import com.example.testtaskcompany.TestTaskCompanyApplication;
 import com.example.testtaskcompany.dto.OrderDto;
 import com.example.testtaskcompany.dto.report.PageDto;
 import com.example.testtaskcompany.dto.report.filter.OrderReportFilter;
 import com.example.testtaskcompany.entities.*;
-import com.example.testtaskcompany.repository.CompanyMaterialStoreRepository;
-import com.example.testtaskcompany.repository.CompanyRepository;
-import com.example.testtaskcompany.repository.OrderRepository;
-import com.example.testtaskcompany.repository.ProductMaterialRepository;
+import com.example.testtaskcompany.repository.*;
 import com.example.testtaskcompany.service.interfaces.IManageOrderService;
 import com.example.testtaskcompany.service.interfaces.IReportOrderService;
+import com.example.testtaskcompany.service.interfaces.IUserService;
 import groovy.util.logging.Slf4j;
 import org.hibernate.Hibernate;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-@SpringBootTest
-@Testcontainers
+@SpringBootTest(classes = {TestSecurityConfig.class, TestTaskCompanyApplication.class})
 @RunWith(SpringRunner.class)
+@Testcontainers
 @Slf4j
 public class OrderControllerTests {
 
     private static final Logger log = LoggerFactory.getLogger(OrderControllerTests.class);
 
     @Autowired
-    private IManageOrderService manageOrderService;
+    private IReportOrderService reportOrderService;
 
     @Autowired
-    private IReportOrderService reportOrderService;
+    private IManageOrderService manageOrderService;
+
+    @MockBean
+    private IUserService userService;
 
     @Autowired
     private CompanyRepository companyRepository;
@@ -55,10 +63,29 @@ public class OrderControllerTests {
     private OrderRepository orderRepository;
 
     @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
     private TransactionTemplate transactionTemplate;
 
+
+    @Before
+    public void createFirstTestUser() {
+        Client client = new Client();
+        client.setUsername("ivanov");
+        client.setCreatedAt(Instant.now());
+        client.setKeycloakId(UUID.randomUUID());
+        clientRepository.save(client);
+    }
+
+
     @Test
-    public void testOrderCreation() throws ExecutionException, InterruptedException {
+    public void testOrderCreationAndReport() throws ExecutionException, InterruptedException {
+
+        Authentication authentication = Mockito.mock(Authentication.class);
+        Mockito.when(authentication.getName()).thenReturn("ivanov");
+        Mockito.when(userService.getAuthentication()).thenReturn(authentication);
+
         CompletableFuture<Void> t1 = CompletableFuture.runAsync(() ->
                 manageOrderService.processOrder(manageOrderService.createOrder(1L, 1, 1L)));
         CompletableFuture<Void> t2 = CompletableFuture.runAsync(() ->
@@ -92,10 +119,6 @@ public class OrderControllerTests {
             Company company = Hibernate.unproxy(companyRepository.getReferenceById(1L), Company.class);
             log.info("Order_result_company_financial: {}", company.getFinancialAccount());
         });
-    }
-
-    @Test
-    public void testGetOrders() {
 
         OrderReportFilter request = new OrderReportFilter();
         request.setColumn("id");
@@ -103,11 +126,9 @@ public class OrderControllerTests {
         request.setPageNumber(0);
         request.setPageSize(50);
         request.setStatus(Status.APPROVED);
-        request.setCompanyId(1L);
 
         PageDto<OrderDto> orders = reportOrderService.getOrders(request);
 
         Assert.assertFalse(orders.getContent().isEmpty());
     }
-
 }

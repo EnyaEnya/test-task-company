@@ -5,12 +5,12 @@ import com.example.testtaskcompany.dto.OrderDto;
 import com.example.testtaskcompany.entities.*;
 import com.example.testtaskcompany.repository.*;
 import com.example.testtaskcompany.service.interfaces.IManageOrderService;
+import com.example.testtaskcompany.service.interfaces.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,14 +33,14 @@ public class ManageOrderServiceImpl implements IManageOrderService {
     private final CompanyMaterialStoreRepository companyMaterialStoreRepository;
     private final ProductMaterialRepository productMaterialRepository;
     private final ClientRepository clientRepository;
+    private final IUserService userService;
 
     @Override
     @Transactional
     @CacheEvict(allEntries = true, cacheNames = "orders")
     public Order createOrder(long productId, int quantity, long companyId) {
         Order order = new Order();
-        order.setClient(clientRepository.getClientByUsername(SecurityContextHolder.getContext()
-                .getAuthentication().getName()));
+        order.setClient(clientRepository.getClientByUsername(userService.getAuthentication().getName()));
         order.setCompany(companyRepository.getReferenceById(companyId));
         order.setProduct(productRepository.getReferenceById(productId));
         order.setQuantity(quantity);

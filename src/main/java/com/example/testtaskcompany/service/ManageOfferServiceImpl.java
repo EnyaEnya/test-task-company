@@ -53,6 +53,8 @@ public class ManageOfferServiceImpl implements IManageOfferService {
     @CacheEvict(allEntries = true, cacheNames = "offers")
     public OfferDto processOffer(Offer offer) {
 
+        offer = offerRepository.getReferenceById(offer.getId());
+
         Company company = offer.getCompany();
 
         if (offerRepository.checkOfferApprovedAndUnprocessed(offer.getId())

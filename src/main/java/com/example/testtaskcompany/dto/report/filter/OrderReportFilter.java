@@ -16,7 +16,7 @@ public class OrderReportFilter extends CommonFilter {
 
     private String productTitle;
 
-    private long companyId;
+    private Long companyId;
 
     private Instant createdFrom;
 

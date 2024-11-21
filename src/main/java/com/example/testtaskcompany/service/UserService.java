@@ -13,6 +13,8 @@ import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,12 @@ public class UserService implements IUserService {
 
     private final UsersResource usersResource;
     private final ClientRepository clientRepository;
+
+    @Override
+    public Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
 
     //todo add two-phase commit
     @Override

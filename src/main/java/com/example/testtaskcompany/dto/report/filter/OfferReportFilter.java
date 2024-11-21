@@ -16,9 +16,9 @@ public class OfferReportFilter extends CommonFilter {
 
     private String materialTitle;
 
-    private long companyId;
+    private Long companyId;
 
-    private long providerId;
+    private Long providerId;
 
     private Instant createdFrom;
 

@@ -14,11 +14,11 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://10.5.0.7:8080/realms/TestCompanyRealm
+          issuer-uri: http://keycloak:8080/realms/TestCompanyRealm
       client:
         provider:
           keycloak:
-            issuer-uri: http://10.5.0.7:8080/realms/TestCompanyRealm
+            issuer-uri: http://keycloak:8080/realms/TestCompanyRealm
             user-name-attribute: preferred_username
         registration:
           keycloak:

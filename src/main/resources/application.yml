@@ -2,7 +2,7 @@ server:
   port: 8181
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5431/test_task_db
+    url: jdbc:postgresql://db:5432/test_task_db
     username: user
     password: password
   liquibase:
@@ -14,11 +14,11 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8082/realms/TestCompanyRealm
+          issuer-uri: http://10.5.0.7:8080/realms/TestCompanyRealm
       client:
         provider:
           keycloak:
-            issuer-uri: http://localhost:8082/realms/TestCompanyRealm
+            issuer-uri: http://10.5.0.7:8080/realms/TestCompanyRealm
             user-name-attribute: preferred_username
         registration:
           keycloak:
@@ -31,11 +31,20 @@ app:
     realm-name: TestCompanyRealm
     client-id: admin-cli
     client-secret: 16xbChzL0lwPNV232akR4n3HfUHFBSz4
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus
+  metrics:
+    tags:
+      application: test-task-company
 #logging:
 #  level:
 #    org.hibernate.SQL: DEBUG
 #    org.hibernate.type.descriptor.sql: TRACE
 #    org.hibernate.orm.jdbc.bind: TRACE
 #    net.ttddyy.dsproxy: debug
-
 #net.ttddyy.dsproxy

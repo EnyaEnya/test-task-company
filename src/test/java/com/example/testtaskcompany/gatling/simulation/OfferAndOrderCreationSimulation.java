@@ -44,11 +44,11 @@ public class OfferAndOrderCreationSimulation extends Simulation {
     private static final int RATE_FOR_GET_REQUEST = 5;
     private static final int DURATION_SEC_FOR_GET_REQUEST = 30;
 
-    private static final HttpProtocolBuilder HTTP_PROTOCOL_BUILDER = http.baseUrl("http://localhost:8181");
-    private static final String DATABASE_URL = "jdbc:postgresql://localhost:5431/test_task_db";
+    private static final HttpProtocolBuilder HTTP_PROTOCOL_BUILDER = http.baseUrl("http://10.5.0.3:8181");
+    private static final String DATABASE_URL = "jdbc:postgresql://10.5.0.4:5432/test_task_db";
     private static final String USER = "user";
     private static final String PASSWORD = "password";
-    private static final String GET_ACCESS_TOKEN_URL = "http://localhost:8082/realms/TestCompanyRealm/protocol/openid-connect/token";
+    private static final String GET_ACCESS_TOKEN_URL = "http://10.5.0.7:8080/realms/TestCompanyRealm/protocol/openid-connect/token";
     public static String USER_TOKEN;
 
     private final static List<PostOfferDto> OFFERS = new ArrayList<>();
